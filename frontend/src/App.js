@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Taxi, BarChart3, Clock, DollarSign, TrendingUp, MapPin } from 'lucide-react';
 import apiService from './services/api';
 import Dashboard from './components/Dashboard';
 import FilterPanel from './components/FilterPanel';
@@ -59,7 +58,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen">
       <Header />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -78,11 +77,27 @@ function App() {
         <Dashboard filters={filters} zones={zones} />
       </main>
 
-      <footer className="bg-white border-t border-gray-200 mt-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <p className="text-center text-gray-500 text-sm">
-            NYC Taxi Mobility Analytics Platform © 2024 | Data Source: NYC TLC
-          </p>
+      {/* Modern Footer */}
+      <footer className="relative mt-20 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-purple-900 to-slate-900"></div>
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjA1IiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-40"></div>
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="text-center">
+            <div className="inline-flex items-center gap-2 mb-4">
+              <div className="h-px w-12 bg-gradient-to-r from-transparent to-purple-500"></div>
+              <p className="text-purple-300 text-sm font-semibold uppercase tracking-wider">
+                NYC Taxi Analytics Platform
+              </p>
+              <div className="h-px w-12 bg-gradient-to-l from-transparent to-purple-500"></div>
+            </div>
+            <p className="text-slate-400 text-sm">
+              Urban Mobility Intelligence Platform © 2024
+            </p>
+            <p className="text-slate-500 text-xs mt-2">
+              Data Source: NYC Taxi & Limousine Commission
+            </p>
+          </div>
         </div>
       </footer>
     </div>
