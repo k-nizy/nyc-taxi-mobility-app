@@ -15,9 +15,9 @@ A comprehensive full-stack application for analyzing and visualizing NYC taxi tr
 ## 👥 Team Members
 
 - **KEVIN NIZEYIMANA** - Backend API, database design, custom algorithms
-- **ARNAUD MANZI INEZA** - Frontend dashboard, React components, visualizations
+- **ARNAUD MANZI INEZA** - Video presentation  
 - **TUYISHIME CHRISTIAN** - Data processing, insights analysis, documentation
-- **ANGE KARIGIRWA & KETSIA ANGE TETA** - Video presentation
+- **ANGE KARIGIRWA & KETSIA ANGE TETA** - Frontend dashboard, React components, visualizations
 
 ---
 
