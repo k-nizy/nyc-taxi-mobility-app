@@ -16,11 +16,10 @@ build/
 .env
 .env.local
 
-# Database
-*.db
+# Database (keep sample DB for deployment)
+# *.db - Commented to keep nyc_taxi.db for deployment
 *.sqlite
 *.sql
-!docs/*.sql
 data/*.csv
 data/*.parquet
 

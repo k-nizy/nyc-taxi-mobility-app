@@ -1,0 +1,13 @@
+backend/
+docs/
+data/
+*.md
+.git/
+.gitignore
+*.db
+*.sqlite
+*.log
+__pycache__/
+venv/
+.env
+node_modules/

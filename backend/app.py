@@ -30,6 +30,78 @@ app.config['JSON_SORT_KEYS'] = False
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key')
 
 
+def build_trip_filters(args):
+    filters = []
+
+    value = args.get('start_date')
+    if value:
+        try:
+            start_date = datetime.strptime(value, '%Y-%m-%d')
+            filters.append(Trip.pickup_datetime >= start_date)
+        except ValueError:
+            pass
+
+    value = args.get('end_date')
+    if value:
+        try:
+            end_date = datetime.strptime(value, '%Y-%m-%d')
+            end_date = end_date.replace(hour=23, minute=59, second=59)
+            filters.append(Trip.pickup_datetime <= end_date)
+        except ValueError:
+            pass
+
+    value = args.get('min_fare')
+    if value not in (None, ''):
+        try:
+            filters.append(Trip.fare_amount >= float(value))
+        except ValueError:
+            pass
+
+    value = args.get('max_fare')
+    if value not in (None, ''):
+        try:
+            filters.append(Trip.fare_amount <= float(value))
+        except ValueError:
+            pass
+
+    value = args.get('min_distance')
+    if value not in (None, ''):
+        try:
+            filters.append(Trip.trip_distance >= float(value))
+        except ValueError:
+            pass
+
+    value = args.get('max_distance')
+    if value not in (None, ''):
+        try:
+            filters.append(Trip.trip_distance <= float(value))
+        except ValueError:
+            pass
+
+    value = args.get('pickup_zone_id')
+    if value not in (None, ''):
+        try:
+            filters.append(Trip.pickup_zone_id == int(value))
+        except ValueError:
+            pass
+
+    value = args.get('dropoff_zone_id')
+    if value not in (None, ''):
+        try:
+            filters.append(Trip.dropoff_zone_id == int(value))
+        except ValueError:
+            pass
+
+    value = args.get('passenger_count')
+    if value not in (None, ''):
+        try:
+            filters.append(Trip.passenger_count == int(value))
+        except ValueError:
+            pass
+
+    return filters
+
+
 @app.route('/')
 def index():
     """API information endpoint."""
@@ -71,51 +143,13 @@ def get_trips():
     try:
         session = get_session()
         
-        # Build query
         query = session.query(Trip).join(Trip.pickup_zone).join(
             Trip.dropoff_zone,
             Trip.dropoff_zone_id == Zone.zone_id
         )
-        
-        # Apply filters
-        filters = []
-        
-        # Date range filter
-        if request.args.get('start_date'):
-            start_date = datetime.strptime(request.args.get('start_date'), '%Y-%m-%d')
-            filters.append(Trip.pickup_datetime >= start_date)
-        
-        if request.args.get('end_date'):
-            end_date = datetime.strptime(request.args.get('end_date'), '%Y-%m-%d')
-            end_date = end_date.replace(hour=23, minute=59, second=59)
-            filters.append(Trip.pickup_datetime <= end_date)
-        
-        # Fare filters
-        if request.args.get('min_fare'):
-            filters.append(Trip.fare_amount >= float(request.args.get('min_fare')))
-        
-        if request.args.get('max_fare'):
-            filters.append(Trip.fare_amount <= float(request.args.get('max_fare')))
-        
-        # Distance filters
-        if request.args.get('min_distance'):
-            filters.append(Trip.trip_distance >= float(request.args.get('min_distance')))
-        
-        if request.args.get('max_distance'):
-            filters.append(Trip.trip_distance <= float(request.args.get('max_distance')))
-        
-        # Zone filters
-        if request.args.get('pickup_zone_id'):
-            filters.append(Trip.pickup_zone_id == int(request.args.get('pickup_zone_id')))
-        
-        if request.args.get('dropoff_zone_id'):
-            filters.append(Trip.dropoff_zone_id == int(request.args.get('dropoff_zone_id')))
-        
-        # Passenger count filter
-        if request.args.get('passenger_count'):
-            filters.append(Trip.passenger_count == int(request.args.get('passenger_count')))
-        
-        # Apply all filters
+
+        filters = build_trip_filters(request.args)
+
         if filters:
             query = query.filter(and_(*filters))
         
@@ -168,31 +202,22 @@ def get_statistics():
     """
     try:
         session = get_session()
-        
-        query = session.query(Trip)
-        
-        # Apply date filters
-        filters = []
-        if request.args.get('start_date'):
-            start_date = datetime.strptime(request.args.get('start_date'), '%Y-%m-%d')
-            filters.append(Trip.pickup_datetime >= start_date)
-        
-        if request.args.get('end_date'):
-            end_date = datetime.strptime(request.args.get('end_date'), '%Y-%m-%d')
-            filters.append(Trip.pickup_datetime <= end_date)
-        
-        if filters:
-            query = query.filter(and_(*filters))
-        
-        # Calculate overall statistics
-        overall_stats = session.query(
+
+        filters = build_trip_filters(request.args)
+
+        overall_query = session.query(
             func.count(Trip.trip_id).label('total_trips'),
             func.avg(Trip.fare_amount).label('avg_fare'),
             func.avg(Trip.trip_distance).label('avg_distance'),
             func.avg(Trip.trip_duration).label('avg_duration'),
             func.avg(Trip.trip_speed).label('avg_speed'),
             func.sum(Trip.total_amount).label('total_revenue')
-        ).filter(and_(*filters) if filters else True).first()
+        )
+
+        if filters:
+            overall_query = overall_query.filter(and_(*filters))
+
+        overall_stats = overall_query.first()
         
         stats = {
             'total_trips': overall_stats.total_trips or 0,
@@ -208,12 +233,17 @@ def get_statistics():
         grouped_stats = []
         
         if group_by == 'hour':
-            results = session.query(
+            group_query = session.query(
                 extract('hour', Trip.pickup_datetime).label('hour'),
                 func.count(Trip.trip_id).label('trip_count'),
                 func.avg(Trip.fare_amount).label('avg_fare'),
                 func.avg(Trip.trip_speed).label('avg_speed')
-            ).filter(and_(*filters) if filters else True).group_by('hour').order_by('hour').all()
+            )
+
+            if filters:
+                group_query = group_query.filter(and_(*filters))
+
+            results = group_query.group_by('hour').order_by('hour').all()
             
             grouped_stats = [{
                 'hour': int(r.hour),
@@ -223,14 +253,17 @@ def get_statistics():
             } for r in results]
         
         elif group_by == 'zone':
-            results = session.query(
+            group_query = session.query(
                 Zone.zone_name,
                 Zone.borough,
                 func.count(Trip.trip_id).label('trip_count'),
                 func.avg(Trip.fare_amount).label('avg_fare')
-            ).join(Trip.pickup_zone).filter(
-                and_(*filters) if filters else True
-            ).group_by(Zone.zone_name, Zone.borough).order_by(
+            ).join(Trip.pickup_zone)
+
+            if filters:
+                group_query = group_query.filter(and_(*filters))
+
+            results = group_query.group_by(Zone.zone_name, Zone.borough).order_by(
                 desc('trip_count')
             ).limit(20).all()
             
@@ -242,13 +275,16 @@ def get_statistics():
             } for r in results]
         
         elif group_by == 'payment_type':
-            results = session.query(
+            group_query = session.query(
                 PaymentType.payment_name,
                 func.count(Trip.trip_id).label('trip_count'),
                 func.avg(Trip.fare_amount).label('avg_fare')
-            ).join(Trip.payment_type).filter(
-                and_(*filters) if filters else True
-            ).group_by(PaymentType.payment_name).all()
+            ).join(Trip.payment_type)
+
+            if filters:
+                group_query = group_query.filter(and_(*filters))
+
+            results = group_query.group_by(PaymentType.payment_name).all()
             
             grouped_stats = [{
                 'payment_type': r.payment_name,
@@ -309,24 +345,22 @@ def get_time_series():
         interval = request.args.get('interval', 'hour')
         metric = request.args.get('metric', 'trip_count')
         
-        filters = []
-        if request.args.get('start_date'):
-            start_date = datetime.strptime(request.args.get('start_date'), '%Y-%m-%d')
-            filters.append(Trip.pickup_datetime >= start_date)
-        
-        if request.args.get('end_date'):
-            end_date = datetime.strptime(request.args.get('end_date'), '%Y-%m-%d')
-            filters.append(Trip.pickup_datetime <= end_date)
-        
+        filters = build_trip_filters(request.args)
+
         # Build query based on interval
         if interval == 'hour':
-            results = session.query(
+            query = session.query(
                 extract('hour', Trip.pickup_datetime).label('time_unit'),
                 func.count(Trip.trip_id).label('trip_count'),
                 func.avg(Trip.fare_amount).label('avg_fare'),
                 func.avg(Trip.trip_speed).label('avg_speed'),
                 func.sum(Trip.total_amount).label('total_revenue')
-            ).filter(and_(*filters) if filters else True).group_by('time_unit').order_by('time_unit').all()
+            )
+
+            if filters:
+                query = query.filter(and_(*filters))
+
+            results = query.group_by('time_unit').order_by('time_unit').all()
             
             time_series = [{
                 'hour': int(r.time_unit),
@@ -337,14 +371,19 @@ def get_time_series():
             } for r in results]
         
         elif interval == 'day':
-            results = session.query(
+            query = session.query(
                 func.date(Trip.pickup_datetime).label('date'),
                 func.count(Trip.trip_id).label('trip_count'),
                 func.avg(Trip.fare_amount).label('avg_fare'),
                 func.avg(Trip.trip_speed).label('avg_speed'),
                 func.sum(Trip.total_amount).label('total_revenue')
-            ).filter(and_(*filters) if filters else True).group_by('date').order_by('date').all()
-            
+            )
+
+            if filters:
+                query = query.filter(and_(*filters))
+
+            results = query.group_by('date').order_by('date').all()
+
             time_series = [{
                 'date': str(r.date),
                 'trip_count': r.trip_count,
@@ -368,36 +407,35 @@ def get_heatmap():
     try:
         session = get_session()
         
-        filters = []
-        if request.args.get('start_date'):
-            start_date = datetime.strptime(request.args.get('start_date'), '%Y-%m-%d')
-            filters.append(Trip.pickup_datetime >= start_date)
-        
-        if request.args.get('end_date'):
-            end_date = datetime.strptime(request.args.get('end_date'), '%Y-%m-%d')
-            filters.append(Trip.pickup_datetime <= end_date)
+        filters = build_trip_filters(request.args)
         
         # Pickup heatmap
-        pickup_data = session.query(
+        pickup_query = session.query(
             Zone.zone_id,
             Zone.zone_name,
             Zone.borough,
             func.count(Trip.trip_id).label('pickup_count')
-        ).join(Trip.pickup_zone).filter(
-            and_(*filters) if filters else True
-        ).group_by(Zone.zone_id, Zone.zone_name, Zone.borough).order_by(
+        ).join(Trip.pickup_zone)
+
+        if filters:
+            pickup_query = pickup_query.filter(and_(*filters))
+
+        pickup_data = pickup_query.group_by(Zone.zone_id, Zone.zone_name, Zone.borough).order_by(
             desc('pickup_count')
         ).limit(50).all()
         
         # Dropoff heatmap
-        dropoff_data = session.query(
+        dropoff_query = session.query(
             Zone.zone_id,
             Zone.zone_name,
             Zone.borough,
             func.count(Trip.trip_id).label('dropoff_count')
-        ).join(Trip.dropoff_zone).filter(
-            and_(*filters) if filters else True
-        ).group_by(Zone.zone_id, Zone.zone_name, Zone.borough).order_by(
+        ).join(Trip.dropoff_zone)
+
+        if filters:
+            dropoff_query = dropoff_query.filter(and_(*filters))
+
+        dropoff_data = dropoff_query.group_by(Zone.zone_id, Zone.zone_name, Zone.borough).order_by(
             desc('dropoff_count')
         ).limit(50).all()
         

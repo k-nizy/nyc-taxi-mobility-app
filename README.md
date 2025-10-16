@@ -2,21 +2,55 @@
 
 A comprehensive fullstack application for analyzing and visualizing NYC taxi trip data, featuring advanced data processing, normalized database design, REST API, and an interactive React dashboard.
 
-## Video Walkthrough
+## 📹 Video Walkthrough
 
-[INSERT VIDEO LINK HERE - 5 minute demonstration]
+**[INSERT 5-MINUTE VIDEO LINK HERE]**
+
+> 🎥 Watch our complete system demonstration, technical explanation, and insights presentation.
+
+## 🔗 GitHub Repository
+
+**[INSERT GITHUB REPO LINK HERE]**
+
+## 👥 Team Members
+
+- **[Member 1 Name]** - Backend API, database design, custom algorithms
+- **[Member 2 Name]** - Frontend dashboard, React components, visualizations
+- **[Member 3 Name]** - Data processing, insights analysis, documentation
+
+---
+
+## 🚀 Deployment
+
+### Deploy to Vercel (Frontend)
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
+
+1. **Fork or clone this repository**
+2. **Connect to Vercel:**
+   - Go to [vercel.com](https://vercel.com)
+   - Import your repository
+   - Vercel will auto-detect the React app
+3. **Set Environment Variables:**
+   - Add `REACT_APP_API_URL` with your backend URL
+4. **Deploy!**
+
+### Backend Deployment
+
+The backend requires a separate deployment. Options:
+- **Render.com** - Free tier available
+- **Railway.app** - Easy Python deployment
+- **Heroku** - Classic PaaS
+- **AWS Lambda** - Serverless option
 
 ## Table of Contents
 
+- [Deployment](#deployment)
 - [System Architecture](#system-architecture)
 - [Features](#features)
 - [Quick Start](#quick-start)
 - [Installation Guide](#installation-guide)
-- [Data Source](#data-source)
 - [API Documentation](#api-endpoints)
-- [Project Structure](#project-structure)
-- [Technical Documentation](#documentation)
-- [Team Contributions](#team-contributions)
 
 ## System Architecture
 
@@ -35,23 +69,25 @@ A comprehensive fullstack application for analyzing and visualizing NYC taxi tri
 
 ## Quick Start
 
-### ⚡ **NEW: 5-Minute Setup with SQLite (No Database Install Required!)**
+### Local Development
 
-**Want to get started immediately without PostgreSQL?**  
-👉 **See [QUICKSTART_SQLITE.md](QUICKSTART_SQLITE.md)** for zero-config setup!
-
-SQLite is perfect for:
-- ✅ Testing and development
-- ✅ Demos and learning
-- ✅ Datasets under 1M trips
-- ✅ No database installation needed
-
-**Or use the automated test script:**
+**Backend:**
 ```bash
 cd backend
-chmod +x RUN_TESTS.sh
-./RUN_TESTS.sh
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+python app.py
 ```
+
+**Frontend:**
+```bash
+cd frontend
+npm install
+npm start
+```
+
+Access at `http://localhost:3000`
 
 ---
 
@@ -59,57 +95,25 @@ chmod +x RUN_TESTS.sh
 
 ### Prerequisites
 
-- **Python 3.8+** (Required)
-- **Node.js 16+** (Required)
-- **npm/yarn** (Required)
-- **PostgreSQL 12+** (Optional - SQLite works out of the box)
+- **Python 3.8+**
+- **Node.js 16+**
+- **npm**
 
-### Step-by-Step Installation
+### Environment Setup
 
-#### 1. Backend Setup
-
+**Backend (.env):**
 ```bash
-# Navigate to backend
 cd backend
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Configure database (SQLite by default)
 cp .env.example .env
-# For PostgreSQL: Edit .env and set USE_SQLITE=false
-
-# Initialize database
-python init_db.py
-
-# Generate sample data (or use real NYC data)
-python create_sample_data.py 10000
-python data_processor.py ../data/sample_taxi_data.csv
-
-# Start API server
-python app.py
+# Edit .env if needed
 ```
 
-API will be available at `http://localhost:5000`
-
-#### 2. Frontend Setup
-
+**Frontend (.env):**
 ```bash
-# Navigate to frontend
 cd frontend
-
-# Install dependencies
-npm install
-
-# Start development server
-npm start
+cp .env.example .env
+# Set REACT_APP_API_URL to your backend URL
 ```
-
-Dashboard will be available at `http://localhost:3000`
 
 ## 📊 Data Source
 
@@ -151,112 +155,35 @@ https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page
 - Recharts: Visualizations
 - Axios: HTTP client
 
-## Documentation
-
-Comprehensive technical documentation is available in `docs/TECHNICAL_REPORT.md` covering:
-- Problem framing and dataset analysis
-- System architecture and design decisions
-- Custom algorithm implementations with pseudocode and complexity analysis
-- Three analytical insights with urban mobility implications
-- Reflection and future improvements
-
 ## 🎯 Project Structure
 
 ```
 nyc-taxi-mobility-app/
 ├── backend/
-│   ├── app.py                 # Flask application
-│   ├── data_processor.py      # Data cleaning pipeline
-│   ├── init_db.py            # Database initialization
-│   ├── models.py             # Database models
-│   ├── algorithms.py         # Custom algorithm implementations
-│   ├── requirements.txt      # Python dependencies
-│   └── .env.example         # Environment template
+│   ├── app.py              # Flask REST API
+│   ├── models.py           # Database models
+│   ├── algorithms.py       # Custom algorithms
+│   ├── requirements.txt    # Python dependencies
+│   ├── .env.example        # Environment template
+│   └── nyc_taxi.db         # SQLite database
 ├── frontend/
 │   ├── src/
-│   │   ├── components/      # React components
-│   │   ├── services/        # API services
+│   │   ├── components/     # React components
+│   │   ├── pages/          # Page components
+│   │   ├── services/       # API services
 │   │   └── App.js          # Main application
 │   ├── package.json
-│   └── tailwind.config.js
-├── docs/
-│   └── TECHNICAL_REPORT.md  # Detailed documentation
+│   └── .env.example        # Frontend config
+├── vercel.json             # Vercel deployment config
 └── README.md
 ```
-
-## 🧪 Testing
-
-```bash
-# Backend tests
-cd backend
-python -m pytest tests/
-
-# Frontend tests
-cd frontend
-npm test
-```
-
-## 🔒 Security Notes
-
-- Never commit `.env` files with credentials
-- Use environment variables for sensitive data
-- API rate limiting implemented
-- Input validation on all endpoints
 
 ## 📄 License
 
 MIT License - Academic Project
 
-## Team Contributions
+## 🔒 Security
 
-[ADD TEAM MEMBER NAMES AND CONTRIBUTIONS HERE]
-
-Example:
-- **Member 1**: Backend API development, database design, data processing pipeline
-- **Member 2**: Frontend dashboard, React components, chart implementations
-- **Member 3**: Custom algorithms, documentation, testing
-
-## GitHub Repository
-
-[INSERT GITHUB REPO LINK HERE]
-
-Commit history demonstrates collaborative development and iterative improvements.
-
-## Running the Application
-
-### Terminal 1 - Backend
-```bash
-cd backend
-source venv/bin/activate
-python app.py
-```
-
-### Terminal 2 - Frontend
-```bash
-cd frontend
-npm start
-```
-
-### Access the Application
-- Frontend Dashboard: http://localhost:3000
-- Backend API: http://localhost:5000
-- API Health Check: http://localhost:5000/health
-
-## Testing the Features
-
-1. **View Statistics**: Dashboard displays 6 key metrics
-2. **Apply Filters**: Use date range, fare, distance, zone filters
-3. **Explore Charts**: Interactive visualizations update dynamically
-4. **API Testing**: Use curl or Postman to test endpoints
-
-## Academic Integrity Statement
-
-This project was developed entirely by the team without AI code generation. All algorithms, database design, and application logic represent original work. The README was written with AI assistance as permitted by assignment guidelines.
-
-## License
-
-MIT License - Academic Project
-
-## Support
-
-For technical questions, refer to `docs/TECHNICAL_REPORT.md` or contact the development team.
+- Never commit `.env` files
+- Use environment variables for all sensitive data
+- Update `REACT_APP_API_URL` in production deployment
