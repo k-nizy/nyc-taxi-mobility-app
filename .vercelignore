@@ -1,7 +1,7 @@
 backend/
 docs/
 data/
-*.md
+*.md.
 .git/
 .gitignore
 *.db
