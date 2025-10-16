@@ -1,6 +1,6 @@
 # NYC Taxi Mobility Analytics Platform
 
-A comprehensive fullstack application for analyzing and visualizing NYC taxi trip data, featuring advanced data processing, normalized database design, REST API, and an interactive React dashboard.
+A comprehensive full-stack application for analyzing and visualizing NYC taxi trip data, featuring advanced data processing, normalized database design, REST API, and an interactive React dashboard.
 
 ## 📹 Video Walkthrough
 
@@ -14,9 +14,10 @@ A comprehensive fullstack application for analyzing and visualizing NYC taxi tri
 
 ## 👥 Team Members
 
-- **[Member 1 Name]** - Backend API, database design, custom algorithms
-- **[Member 2 Name]** - Frontend dashboard, React components, visualizations
-- **[Member 3 Name]** - Data processing, insights analysis, documentation
+- **KEVIN NIZEYIMANA** - Backend API, database design, custom algorithms
+- **ARNAUD MANZI INEZA** - Frontend dashboard, React components, visualizations
+- **TUYISHIME CHRISTIAN** - Data processing, insights analysis, documentation
+- **ANGE KARIGIRWA & KETSIA ANGE TETA** - Video presentation
 
 ---
 
