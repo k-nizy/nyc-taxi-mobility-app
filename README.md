@@ -4,7 +4,7 @@ A comprehensive full-stack application for analyzing and visualizing NYC taxi tr
 
 ## 📹 Video Walkthrough
 
-**[INSERT 5-MINUTE VIDEO LINK HERE]**
+**[(https://youtu.be/Z1QR78wCf20)]**
 
 > 🎥 Watch our complete system demonstration, technical explanation, and insights presentation.
 
