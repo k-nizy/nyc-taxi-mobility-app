@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import apiService from '../services/api';
 import TimeSeriesChart from './charts/TimeSeriesChart';
 import HeatmapChart from './charts/HeatmapChart';
 import TopRoutesChart from './charts/TopRoutesChart';
 import PaymentDistribution from './charts/PaymentDistribution';
 
-const Dashboard = ({ filters, zones }) => {
+/**
+ * Dashboard component that displays various data visualizations
+ * @param {Object} props - Component props
+ * @param {Object} props.filters - Current filter values
+ * @param {Array} props.zones - List of available zones
+ */
+const Dashboard = ({ filters = {}, zones = [] }) => {
   const [timeSeries, setTimeSeries] = useState([]);
   const [heatmap, setHeatmap] = useState({ pickup: [], dropoff: [] });
   const [topRoutes, setTopRoutes] = useState([]);
@@ -19,16 +26,33 @@ const Dashboard = ({ filters, zones }) => {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
+      
       const [
         timeSeriesData,
         heatmapData,
         routesData,
         hourlyData
       ] = await Promise.all([
-        apiService.getTimeSeries({ ...filters, interval: 'day' }),
-        apiService.getHeatmap(filters),
-        apiService.getTopRoutes({ ...filters, limit: 10 }),
+        apiService.getTimeSeries({ ...filters, interval: 'day' })
+          .catch(err => {
+            console.error('Error loading time series:', err);
+            return { time_series: [] };
+          }),
+        apiService.getHeatmap(filters)
+          .catch(err => {
+            console.error('Error loading heatmap:', err);
+            return { pickup: [], dropoff: [] };
+          }),
+        apiService.getTopRoutes({ ...filters, limit: 10 })
+          .catch(err => {
+            console.error('Error loading top routes:', err);
+            return { routes: [] };
+          }),
         apiService.getTimeSeries({ ...filters, interval: 'hour' })
+          .catch(err => {
+            console.error('Error loading hourly stats:', err);
+            return { time_series: [] };
+          })
       ]);
 
       setTimeSeries(timeSeriesData.time_series || []);
@@ -36,7 +60,7 @@ const Dashboard = ({ filters, zones }) => {
       setTopRoutes(routesData.routes || []);
       setHourlyStats(hourlyData.time_series || []);
     } catch (error) {
-      console.error('Error loading dashboard data:', error);
+      console.error('Unexpected error in loadDashboardData:', error);
     } finally {
       setLoading(false);
     }
@@ -106,4 +130,34 @@ const Dashboard = ({ filters, zones }) => {
   );
 };
 
-export default Dashboard;
+Dashboard.propTypes = {
+  /**
+   * Filter values for data fetching
+   */
+  filters: PropTypes.shape({
+    dateRange: PropTypes.shape({
+      startDate: PropTypes.string,
+      endDate: PropTypes.string
+    }),
+    paymentTypes: PropTypes.arrayOf(PropTypes.string),
+    // Add other filter props as needed
+  }),
+  
+  /**
+   * List of available zones
+   */
+  zones: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      name: PropTypes.string.isRequired,
+      // Add other zone props as needed
+    })
+  )
+};
+
+Dashboard.defaultProps = {
+  filters: {},
+  zones: []
+};
+
+export default React.memo(Dashboard);
