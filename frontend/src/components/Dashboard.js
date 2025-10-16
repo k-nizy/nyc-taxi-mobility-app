@@ -18,6 +18,18 @@ const Dashboard = ({ filters = {}, zones = [] }) => {
   const [topRoutes, setTopRoutes] = useState([]);
   const [hourlyStats, setHourlyStats] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState('');
+  
+  // Show loading state
+  if (loading) {
+    return <div>Loading dashboard data...</div>;
+  }
+  
+  // Show error state
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   useEffect(() => {
     loadDashboardData();
@@ -59,6 +71,7 @@ const Dashboard = ({ filters = {}, zones = [] }) => {
       setHeatmap(heatmapData);
       setTopRoutes(routesData.routes || []);
       setHourlyStats(hourlyData.time_series || []);
+      setLastUpdated(new Date().toLocaleTimeString());
     } catch (error) {
       console.error('Unexpected error in loadDashboardData:', error);
     } finally {
@@ -68,6 +81,11 @@ const Dashboard = ({ filters = {}, zones = [] }) => {
 
   return (
     <div className="space-y-8">
+      {lastUpdated && (
+        <div className="text-sm text-gray-500">
+          Last updated: {lastUpdated}
+        </div>
+      )}
       {/* Time Series Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <TimeSeriesChart
