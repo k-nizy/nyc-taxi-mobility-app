@@ -187,3 +187,4 @@ MIT License - Academic Project
 - Never commit `.env` files
 - Use environment variables for all sensitive data
 - Update `REACT_APP_API_URL` in production deployment
+
