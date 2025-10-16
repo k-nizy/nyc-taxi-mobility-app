@@ -1,4 +1,4 @@
-"""
+""""
 Database models for NYC Taxi Trip application.
 Fully normalized schema with proper relationships and indexing.
 """
