@@ -47,6 +47,7 @@ The NYC Taxi Trip dataset contains detailed trip-level records including:
 
 ### 2.1 System Architecture Diagram
 
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                    USER INTERFACE                       │
